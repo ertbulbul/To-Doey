@@ -7,14 +7,21 @@
 //
 
 import UIKit
+import SVProgressHUD
 
 class ToDoListViewController: UITableViewController {
     
     var itemArray = ["Her","Zaman","Her","Yerde","En","Büyük","Fener"]
     
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
     //MARK - TableView DataSource Methods
@@ -54,8 +61,14 @@ class ToDoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) {(action) in
             //what happen click add
-            self.itemArray.append(enteredMessage.text!)
-            self.tableView.reloadData()
+            if enteredMessage.text == "" {
+                SVProgressHUD.showError(withStatus: "You Can Not Enter Empty Note")
+            }else {
+                self.itemArray.append(enteredMessage.text!)
+                self.defaults.set(self.itemArray, forKey: "TodoListArray")
+                self.tableView.reloadData()
+            }
+            
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
